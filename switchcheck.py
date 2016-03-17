@@ -15,13 +15,13 @@ import RPi.GPIO as GPIO
 #Setup GPIO Pins
 GPIO.setmode(GPIO.BCM)
 
-# Switch Pin is HIGH when cafe open
-# Switch Pin is LOW when cafe closed
+# Switch Pin is LOW when cafe open
+# Switch Pin is HIGH when cafe closed
 GPIO.setup(17, GPIO.IN)
 
 #LED Pins
-GPIO.setup(23, GPIO.IN) #Green LED
-GPIO.setup(24, GPIO.IN) #Red LED
+GPIO.setup(23, GPIO.OUT) #Green LED
+GPIO.setup(24, GPIO.OUT) #Red LED
 
 #Set refresh period to 1 second
 pollTime = 3
@@ -34,10 +34,11 @@ cafestatus = 2
 htmlFile = "/home/pi/nanaswitch/cafenanaswitch.github.io/index.html"
 
 def checkStatus():
+    global cafestatus
     # Will call f() again in pollTime seconds
     threading.Timer(pollTime, checkStatus).start()
     
-    if(GPIO.input(17)):
+    if(not (GPIO.input(17))):
         # Cafe is open
         if (cafestatus != 1):
             GPIO.output(24, GPIO.LOW)
@@ -45,7 +46,7 @@ def checkStatus():
             cafestatus = 1
             updateHTML(1)
 
-    elif( !(GPIO.input(17))):
+    elif(GPIO.input(17)):
         # Cafe is closed
         if (cafestatus != 0):
             GPIO.output(24, GPIO.HIGH)
@@ -56,9 +57,9 @@ def checkStatus():
 def updateHTML(statuscode):
     # Updates HTML file and pushes it to github.io page
     if(statuscode == 1):
-        replacestring = "Cafe Nana is currently OPEN! =) \n Switch last updated at " + strftime("%H:%M:%S  %Y-%m-%d")
+        replacestring = "Cafe Nana is currently OPEN! =)      \n Switch last updated at " + strftime("%H:%M:%S  %Y-%m-%d")
     elif(statuscode == 0):
-        replacestring = "Cafe Nana is now CLOSED. =( \n Switch last updated at " + strftime("%H:%M:%S  %Y-%m-%d")
+        replacestring = "Cafe Nana is now CLOSED. =(      \n Switch last updated at " + strftime("%H:%M:%S  %Y-%m-%d")
 
     with open(htmlFile, "r+") as f:
         originalhtml = f.read()
