@@ -40,7 +40,6 @@ def checkStatus():
     threading.Timer(pollTime, checkStatus).start()
     
     if( not(GPIO.input(17))):
-        print "Switch read OPEN"
         # Cafe is open
         if (cafestatus != 1):
             GPIO.output(24, GPIO.LOW)
