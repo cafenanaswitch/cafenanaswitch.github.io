@@ -15,6 +15,7 @@ import RPi.GPIO as GPIO
 #Setup GPIO Pins
 GPIO.setmode(GPIO.BCM)
 
+# RED position means the switch is CONNECTED
 # Switch Pin is LOW when cafe open
 # Switch Pin is HIGH when cafe closed
 GPIO.setup(17, GPIO.IN)
@@ -23,8 +24,8 @@ GPIO.setup(17, GPIO.IN)
 GPIO.setup(23, GPIO.OUT) #Green LED
 GPIO.setup(24, GPIO.OUT) #Red LED
 
-#Set refresh period to 1 second
-pollTime = 3
+#Set refresh period to 2 seconds
+pollTime = 2 
 
 # cafestatus 1 when cafe open
 # cafestatus 0 when cafe closed
@@ -38,7 +39,8 @@ def checkStatus():
     # Will call f() again in pollTime seconds
     threading.Timer(pollTime, checkStatus).start()
     
-    if(not (GPIO.input(17))):
+    if( not(GPIO.input(17))):
+        print "Switch read OPEN"
         # Cafe is open
         if (cafestatus != 1):
             GPIO.output(24, GPIO.LOW)
@@ -46,7 +48,7 @@ def checkStatus():
             cafestatus = 1
             updateHTML(1)
 
-    elif(GPIO.input(17)):
+    if((GPIO.input(17))):
         # Cafe is closed
         if (cafestatus != 0):
             GPIO.output(24, GPIO.HIGH)
